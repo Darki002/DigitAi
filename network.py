@@ -25,7 +25,8 @@ class Network:
         :param eta: learning rate
         :param test_data: the data to evaluate the learning
         """
-        if test_data: n_test = len(test_data)
+        if test_data:
+            n_test = len(test_data)
         n = len(training_data)
 
         for j in range(epochs):
@@ -67,6 +68,34 @@ class Network:
             activation = sigmoid(z)
             activations.append(activation)
 
+        delta = cost_derivative(activations[-1], y) * sigmoid_derivative(zs[-1])
+
+        new_b[-1] = delta
+        new_w[-1] = np.dot(delta, activations[-2].transpose())
+
+        for l in range(2, self.num_layers):
+            z = zs[-l]
+            sd = sigmoid_derivative(z)
+            delta = np.dot(self.weights[-l + 1].transpose(), delta) * sd
+
+            new_b[-l] = delta
+            new_w[-l] = np.dot(delta, activations[-l - 1].transpose())
+
+        return new_b, new_w
+
+    def evaluate(self, test_data):
+        test_result = [(np.argmax(self.feedforward(x)), y) for x, y in test_data]
+        return sum(int(x == y) for x, y in test_result)
+
+
+def cost_derivative(output_activation, y):
+    return output_activation - y
+
 
 def sigmoid(z):
     return 1.0 / (1.0 + np.exp(z))
+
+
+def sigmoid_derivative(z):
+    """Derivative of the sigmoid function."""
+    return sigmoid(z)*(1-sigmoid(z))
