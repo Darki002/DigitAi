@@ -10,6 +10,10 @@ class Network:
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
 
+    def load(self, weights, biases):
+        self.biases = biases
+        self.weights = weights
+
     def feedforward(self, a):
         """Return the output of the network if "a" is input."""
         for b, w in zip(self.biases, self.weights):
@@ -31,9 +35,9 @@ class Network:
         for j in range(epochs):
             random.shuffle(training_data)
 
-            mini_batchs = [training_data[k:k + mini_batch_size] for k in range(0, n, mini_batch_size)]
+            mini_batches = [training_data[k:k + mini_batch_size] for k in range(0, n, mini_batch_size)]
 
-            for mini_batch in mini_batchs:
+            for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
 
             if test_data:
@@ -62,9 +66,7 @@ class Network:
         zs = []
 
         for b, w in zip(self.biases, self.weights):
-            ka = np.dot(w, activation)
-
-            z = ka + b
+            z = np.dot(w, activation) + b
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
@@ -94,7 +96,7 @@ def cost_derivative(output_activation, y):
 
 
 def sigmoid(z):
-    return 1.0 / (1.0 + np.exp(z))
+    return 1.0 / (1.0 + np.exp(-z))
 
 
 def sigmoid_derivative(z):
