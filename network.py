@@ -1,3 +1,4 @@
+import pickle
 import random
 import numpy as np
 
@@ -10,9 +11,14 @@ class Network:
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
 
-    def load(self, weights, biases):
-        self.biases = biases
-        self.weights = weights
+    @staticmethod
+    def load():
+        with open('network.pkl', 'rb') as f:
+            return pickle.load(f)
+
+    def save(self):
+        with open('network.pkl', 'wb') as f:
+            pickle.dump(self, f)
 
     def feedforward(self, a):
         """Return the output of the network if "a" is input."""
