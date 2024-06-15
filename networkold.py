@@ -1,8 +1,9 @@
 import random
+
 import numpy as np
 
 
-class Network:
+class NetworkOld:
     def __init__(self, sizes: list[int]):
         self.num_layers = len(sizes)
         self.sizes = sizes
@@ -13,14 +14,14 @@ class Network:
     def feedforward(self, a):
         """Return the output of the network if "a" is input."""
         for b, w in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(w, a) + b)
+            a = sigmoid(np.add(np.dot(w, a), b))
         return a
 
     def SGD(self, training_data, epochs, mini_batch_size, eta, test_data=None):
         """
         :param training_data: the training data (x, y) where x is the data and y the desired outcome.
         :param epochs: how many epochs to train
-        :param mini_batch_size: size of the mini batches
+        :param mini_batch_size: size of the mini bathces
         :param eta: learning rate
         :param test_data: the data to evaluate the learning
         """
@@ -47,8 +48,8 @@ class Network:
 
         for x, y in mini_batch:
             delta_new_b, delta_new_w = self.backprop(x, y)
-            new_b = [nb + dnb for nb, dnb in zip(new_b, delta_new_b)]
-            new_w = [nw + dnw for nw, dnw in zip(new_w, delta_new_w)]
+            new_b = [np.add(nb, dnb) for nb, dnb in zip(new_b, delta_new_b)]
+            new_w = [np.add(nw, dnw) for nw, dnw in zip(new_w, delta_new_w)]
 
         self.biases = [b - (eta / len(mini_batch)) * nb for b, nb in zip(self.biases, new_b)]
         self.weights = [w - (eta / len(mini_batch)) * nw for w, nw in zip(self.weights, new_w)]
@@ -62,9 +63,7 @@ class Network:
         zs = []
 
         for b, w in zip(self.biases, self.weights):
-            ka = np.dot(w, activation)
-
-            z = ka + b
+            z = np.add(np.dot(w, activation), b)
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
