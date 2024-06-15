@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageOps
 import io
 import os
 import base64
@@ -49,10 +49,11 @@ def upload():
 
     sharpening_filter = ImageFilter.UnsharpMask()
     image_bw_resized = image_bw_resized.filter(sharpening_filter)
+    image_bw_inverted = ImageOps.invert(image_bw_resized)
 
-    image_bw_resized.save('image-resize.png')
+    image_bw_inverted.save('image-for-model.png')
 
-    image_array = np.array(image_bw_resized)
+    image_array = np.array(image_bw_inverted)
     image_array_normalized = image_array / 255.0
     image_array_reshaped = image_array_normalized.reshape(784, 1)
 
